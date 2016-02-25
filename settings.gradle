@@ -1,0 +1,9 @@
+rootProject.name = 'TransactionAnalyst'
+
+include 'Classical'
+
+include 'Lambda'
+
+include 'Lambda/Batch-Layer'
+
+include 'Lambda/Speed-Layer'
