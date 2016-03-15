@@ -11,8 +11,6 @@ object Main extends App with RestInterface {
 
   implicit val defaultActorSystem:ActorSystem = ActorSystem("default");
 
-  //TODO: Rewrite as various actors!
-
   exposeRestInterface(host= "localhost", port = 9080)
 
   /*

@@ -1,9 +1,10 @@
 package prv.zielony.transaction.analyst.classical.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import prv.zielony.transaction.analyst.classical.dto.AmountCurrencyDto;
 import prv.zielony.transaction.analyst.classical.model.Currency;
+import prv.zielony.transaction.analyst.classical.services.AccountsService;
 
 /**
  * Created by zielony on 16.02.16.
@@ -11,16 +12,19 @@ import prv.zielony.transaction.analyst.classical.model.Currency;
 @RestController("/accounts")
 public class AccountsController {
 
+    @Autowired
+    private AccountsService accountsService;
+
     @RequestMapping(value = "/country/{country}/balance?minAge={minAge}&maxAge={maxAge}",
             produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public AmountCurrencyDto getAverageAccountBalanceByCountry(@PathVariable("country") String country,
+    public Double getAverageAccountBalanceByCountry(@PathVariable("country") String country,
                                                                @RequestParam("minAge") Integer minAge,
                                                                @RequestParam("maxAge") Integer maxAge) {
-        return new AmountCurrencyDto(10, Currency.USD);
+        return accountsService.getAverageBalanceByCountry(country, minAge, maxAge);
     }
 
     @RequestMapping(value = "/country/{country}/active", method = RequestMethod.GET)
     public int countActiveAccountsPerCountry(String country) {
-        return 1700;
+        return accountsService.getAccountNumberForCountry(country);
     }
 }

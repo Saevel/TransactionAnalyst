@@ -1,15 +1,13 @@
 package prv.zielony.transaction.analyst.lambda.batch.layer
 
+import org.apache.spark.sql.{Dataset, SQLContext}
+import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 import prv.zielony.proper.model.Bundle
 import prv.zielony.proper.path.classpath
 import prv.zielony.proper.utils.load
 import prv.zielony.transaction.analyst.lambda.batch.layer.dao.MasterDataSet
-import prv.zielony.transaction.analyst.lambda.batch.layer.events._
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.accounts.{AccountRemovedEvent, AccountCreatedEvent}
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.transactions.{TransferEvent, CashOperationEvent}
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.users.{ContactDataChangedEvent, PersonalDataChangedEvent, UserDeletedEvent, UserCreatedEvent}
 
 import prv.zielony.proper.inject._
 import prv.zielony.proper.default._
@@ -18,52 +16,53 @@ import prv.zielony.proper.converters.auto._
 import MasterDataSet._
 
 import com.owlike.genson.defaultGenson._
+import prv.zielony.transaction.analyst.lambda.events.accounts.{AccountRemovedEvent, AccountCreatedEvent}
+import prv.zielony.transaction.analyst.lambda.events.transactions.{CashOperationEvent, TransferEvent}
+import prv.zielony.transaction.analyst.lambda.events.users.{UserCreatedEvent, UserDeletedEvent, PersonalDataChangedEvent, ContactDataChangedEvent}
 
 /**
  * Created by zielony on 14.02.16.
  */
 package object dao {
 
-  //Move to a separate object and import
-  private val sparkBundle:Bundle = load(classpath:/"spark.properties")
+  import prv.zielony.transaction.analyst.lambda.batch.layer.spark._
 
-  private val sparkConf:SparkConf = new SparkConf()
-    .setAppName(%("spark.app.name" @@ sparkBundle))
-    .setMaster(%("spark.master" @@ sparkBundle));
+  private[dao] def findAll[EventType](sqlContext:SQLContext)(fileName:String)(implicit m:Manifest[EventType]) = {
 
-  val sparkContext:SparkContext = new SparkContext(sparkConf)
-
-  private def findAll[EventType](fileName:String)(implicit manifest:Manifest[EventType]) = {
-    sparkContext.textFile(fileName) map { line =>
+    sqlContext.sparkContext.textFile(fileName) map { line =>
       fromJson[EventType](line)
     }
   }
 
-  private[services] lazy val findAllTransfers:(RDD[TransferEvent]) =
-    findAll[TransferEvent](transfersFileName)
+  lazy val allTransfers:(RDD[TransferEvent]) =
+    findAll[TransferEvent](sqlContext)(transfersFileName)
 
-  private[services] lazy val findAllAccountsCreated:(RDD[AccountCreatedEvent]) =
-    findAll[AccountCreatedEvent](accountsCreatedFileName)
+  lazy val allAccountsCreated:(RDD[AccountCreatedEvent]) =
+    findAll[AccountCreatedEvent](sqlContext)(accountsCreatedFileName)
 
-  private[services] lazy val findAllAccountsRemoved:(RDD[AccountRemovedEvent]) =
-    findAll[AccountRemovedEvent](accountsRemovedFileName)
+  lazy val allAccountsRemoved:(RDD[AccountRemovedEvent]) =
+    findAll[AccountRemovedEvent](sqlContext)(accountsRemovedFileName)
 
-  private[services] lazy val findAllCashOperations:(RDD[CashOperationEvent]) =
-    findAll[CashOperationEvent](cashOperationsFileName)
+  lazy val allCashOperations:(RDD[CashOperationEvent]) =
+    findAll[CashOperationEvent](sqlContext)(cashOperationsFileName)
 
-  private[services] lazy val findAllUsersCreated:(RDD[UserCreatedEvent]) =
-    findAll[UserCreatedEvent](usersCreatedFileName)
+  lazy val allUsersCreated:(RDD[UserCreatedEvent]) =
+    findAll[UserCreatedEvent](sqlContext)(usersCreatedFileName)
 
-  private[services] lazy val findAllUsersRemoved:(RDD[UserDeletedEvent]) =
-    findAll[UserDeletedEvent](usersRemovedFileName)
+  lazy val allUsersRemoved:(RDD[UserDeletedEvent]) =
+    findAll[UserDeletedEvent](sqlContext)(usersRemovedFileName)
 
-  private[services] lazy val findAllPersonalDataChanges:(RDD[PersonalDataChangedEvent]) =
-    findAll[PersonalDataChangedEvent](personalDataChangedFileName)
+  lazy val allPersonalDataChanges:(RDD[PersonalDataChangedEvent]) =
+    findAll[PersonalDataChangedEvent](sqlContext)(personalDataChangedFileName)
 
-  private[services] lazy val findAllContactDataChanges:(RDD[ContactDataChangedEvent]) =
-    findAll[ContactDataChangedEvent](contactDataChangedFileName)
+  lazy val allContactDataChanges:(RDD[ContactDataChangedEvent]) =
+    findAll[ContactDataChangedEvent](sqlContext)(contactDataChangedFileName)
 
-  private[services] def saveAll[Type](file:String)(entities:RDD[Type])(implicit m:Manifest[Type]):Unit = {
-    entities.map (toJson[Type](_)).saveAsTextFile(file)
+  def saveAll[Type](file:String)(entities:RDD[Type])(implicit m:Manifest[Type]):Unit = {
+    entities.map(toJson[Type](_)) saveAsTextFile(file)
+  }
+
+  def saveStream[Type](file:String)(entities:DStream[Type])(implicit m:Manifest[Type]):Unit = {
+    (entities map(toJson[Type](_))).foreachRDD(_.saveAsTextFile(file))
   }
 }

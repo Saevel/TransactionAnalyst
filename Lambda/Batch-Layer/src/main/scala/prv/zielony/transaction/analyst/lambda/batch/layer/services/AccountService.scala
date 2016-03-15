@@ -1,11 +1,10 @@
 package prv.zielony.transaction.analyst.lambda.batch.layer.services
 
 import java.time.LocalDateTime
-
 import org.apache.spark.rdd.RDD
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.accounts.AccountCreatedEvent
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.transactions.TransactionStatus
 import prv.zielony.transaction.analyst.lambda.batch.layer.util.{TransactionsData, AccountsData}
+import prv.zielony.transaction.analyst.lambda.events.accounts.AccountCreatedEvent
+import prv.zielony.transaction.analyst.lambda.events.transactions.TransactionStatus
 import prv.zielony.transaction.analyst.lambda.model.{CashOperationType, User, Currency, Account}
 
 /**
@@ -13,7 +12,7 @@ import prv.zielony.transaction.analyst.lambda.model.{CashOperationType, User, Cu
  */
 object AccountService {
 
-  private[services] def getAllAccounts(accountsData:(=> AccountsData), transactionsData:(=> TransactionsData)):RDD[Account] = {
+  private[services] def getAllAccounts(accountsData: => AccountsData, transactionsData: => TransactionsData):RDD[Account] = {
 
     val activeAccounts = accountsData.createdEvents keyBy(_.id) subtractByKey (accountsData.removedEvents keyBy(_.id))
 
@@ -54,7 +53,7 @@ object AccountService {
     } keyBy (_.targetAccountId) mapValues (_.amount) groupByKey
   }
 
-  private[services] def getAllAccountsWithUsers(accounts:(=> RDD[Account]), users:(=> RDD[User])):RDD[Account with User] = {
+  private[services] def getAllAccountsWithUsers(accounts: => RDD[Account], users: => RDD[User]):RDD[Account with User] = {
 
     accounts.keyBy(_.ownerId) join (users keyBy(_.id)) map { record =>
       val( id, (account, user)) = record

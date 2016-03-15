@@ -1,0 +1,83 @@
+apply plugin: 'scala'
+
+def libs = [
+        scala_lang: [
+                group:'org.scala-lang',
+                version: '2.11.7',
+                name: 'scala-library'
+        ],
+        spark: [
+                group: 'org.apache.spark',
+                version: '1.6.0',
+                streaming: 'spark-streaming_2.11',
+                streaming_kafka: 'spark-streaming-kafka_2.11',
+                sql: 'spark-sql_2.11'
+        ],
+        kafka: [
+                group: 'org.apache.kafka',
+                version: '0.8.2.2',
+                name: 'kafka-clients'
+        ],
+        spray: [
+                group:'io.spray',
+                version: '1.3.3',
+                spray_can: 'spray-can_2.11',
+                spray_http: 'spray-http_2.11',
+                spray_routing: 'spray-routing_2.11'
+        ],
+        genson: [
+                group: 'com.owlike',
+                version:'1.3',
+                name: 'genson-scala_2.11'
+        ],
+        junit: [
+                group: 'junit',
+                version: '4.12',
+                name: 'junit'
+        ],
+        scalatest: [
+                group: 'org.scalatest',
+                version: '2.2.6',
+                name: 'scalatest_2.11'
+        ],
+        scalacheck: [
+                group: 'org.scalacheck',
+                version: '1.13.0',
+                name: 'scalacheck_2.11'
+        ],
+        phantom: [
+                group: 'com.websudos',
+                name: 'phantom-dsl_2.11',
+                version: '1.22.0'
+        ]
+]
+
+repositories {
+        mavenCentral()
+        jcenter()
+        maven {url 'https://oss.sonatype.org/content/repositories/releases' }
+        maven {url 'https://oss.sonatype.org/content/groups/scala-tools/' }
+        maven {url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven {url 'http://oss.sonatype.org/content/repositories/staging' }
+        maven {url 'http://download.java.net/maven/2/'}
+        maven {url 'http://maven.twttr.com'}
+        maven {url 'http://repo.typesafe.com/typesafe/snapshots/' }
+        maven {url 'http://repo.typesafe.com/typesafe/releases/' }
+}
+
+dependencies {
+        compile(libs.scala_lang)
+        compile([group:libs.spark.group, version: libs.spark.version, name:libs.spark.streaming_kafka])
+        compile([group:libs.spark.group, version: libs.spark.version, name:libs.spark.streaming])
+        compile(libs.genson)
+        compile([group: libs.spray.group, version: libs.spray.version, name: libs.spray.spray_can])
+        compile([group: libs.spray.group, version: libs.spray.version, name: libs.spray.spray_routing])
+        compile([group: libs.spray.group, version: libs.spray.version, name: libs.spray.spray_http])
+        compile(libs.phantom)
+
+        compile(files('lib/Proper-1.0.jar'))
+
+        testCompile(libs.scalacheck)
+        testCompile(libs.junit)
+        testCompile(libs.scalatest)
+}

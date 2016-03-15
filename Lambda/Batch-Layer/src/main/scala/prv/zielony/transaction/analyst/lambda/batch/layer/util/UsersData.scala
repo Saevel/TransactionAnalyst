@@ -1,7 +1,7 @@
 package prv.zielony.transaction.analyst.lambda.batch.layer.util
 
 import org.apache.spark.rdd.RDD
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.users.{ContactDataChangedEvent, PersonalDataChangedEvent, UserDeletedEvent, UserCreatedEvent}
+import prv.zielony.transaction.analyst.lambda.events.users.{UserCreatedEvent, UserDeletedEvent, PersonalDataChangedEvent, ContactDataChangedEvent}
 
 /**
  * Created by zielony on 21.02.16.

@@ -20,8 +20,6 @@ import com.owlike.genson.defaultGenson._
  */
 package object dao {
 
-  //TODO: Modularize!
-
   private val sparkBundle = load(classpath:/"spark.properties")
 
   private val sparkConf:SparkConf = new SparkConf()
@@ -30,7 +28,7 @@ package object dao {
 
   val sparkContext:SparkContext = new SparkContext(sparkConf)
 
-  private[services] def findCashOperations(from:Option[LocalDateTime], to:Option[LocalDateTime]): RDD[CashOperation] = {
+  def findCashOperations(from:Option[LocalDateTime], to:Option[LocalDateTime]): RDD[CashOperation] = {
 
     val allOperations = sparkContext.textFile(BatchViews.cashOperationsFile).map { line =>
         fromJson[CashOperation](line)
@@ -52,13 +50,13 @@ package object dao {
     }
   }
 
-  private[services] def findAllClients():RDD[User] = {
+  def findAllClients():RDD[User] = {
     sparkContext.textFile(BatchViews.usersFile) map { line =>
       fromJson[User](line)
     }
   }
 
-  private[services] def findAccountsByCountry(name:String):RDD[Account with User with Country] = {
+  def findAccountsByCountry(name:String):RDD[Account with User with Country] = {
 
     sparkContext.textFile(BatchViews.accountsWithUsersFile) map { line =>
       fromJson[Account with User with Country](line)
@@ -67,7 +65,7 @@ package object dao {
     }
   }
 
-  private[services] def findAccountsByUserAge(minAge:Option[Int], maxAge:Option[Int]):RDD[Account with User with Country] = {
+  def findAccountsByUserAge(minAge:Option[Int], maxAge:Option[Int]):RDD[Account with User with Country] = {
 
     val allAccounts = sparkContext.textFile(BatchViews.accountsWithUsersFile) map { line =>
       fromJson[Account with User with Country](line)
@@ -77,7 +75,7 @@ package object dao {
      allAccounts
     }
     else {
-      val now = new LocalDateTime();
+      val now = LocalDateTime.now();
       allAccounts filter { account =>
 
         val age = now.getYear - account.birthDate.get.getYear
@@ -85,4 +83,11 @@ package object dao {
       }
     }
   }
+
+  //TODO: Maybe save stuff in batches?
+  private def save[EventType](context:SparkContext, file:String)(event:EventType)(implicit m:Manifest[EventType]):Unit = {
+    context.parallelize(Seq(toJson[EventType](event))).saveAsTextFile(file)
+  }
+
+  val save
 }

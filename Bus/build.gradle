@@ -1,0 +1,48 @@
+apply plugin: 'java'
+
+def libs = [
+        spring_boot: [
+                group: 'org.springframework.boot',
+                version: '1.3.2.RELEASE',
+                starter_web:'spring-boot-starter-web',
+                starter_test: 'spring-boot-starter-test'
+        ],
+        camel: [
+                group: 'org.apache.camel',
+                version: '2.15.1',
+                spring_boot: 'camel-spring-boot',
+                http: 'camel-http'
+        ]
+]
+
+
+buildscript {
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath([group: 'org.springframework.boot', version: '1.3.2.RELEASE',
+                   name: 'spring-boot-gradle-plugin'])
+    }
+}
+
+apply plugin: 'spring-boot'
+
+dependencies {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        compile([group:libs.camel.group, version:libs.camel.version, name:libs.camel.spring_boot])
+        compile([group:libs.camel.group, version:libs.camel.version, name:libs.camel.http])
+        compile([group:libs.spring_boot.group, version: libs.spring_boot.version, name: libs.spring_boot.starter_web])
+
+        testCompile([group:libs.spring_boot.group, version: libs.spring_boot.version, name: libs.spring_boot.starter_test])
+    }
+
+}

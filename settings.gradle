@@ -4,6 +4,15 @@ include 'Classical'
 
 include 'Lambda'
 
-include 'Lambda/Batch-Layer'
+include 'Modern'
 
-include 'Lambda/Speed-Layer'
+include 'Bus'
+
+include 'Tests'
+
+apply from: 'Lambda/settings.gradle'
+
+project(':Batch-Layer').projectDir = new File(rootDir, 'Lambda/Batch-Layer')
+project(':Speed-Layer').projectDir = new File(rootDir, 'Lambda/Speed-Layer')
+project(':Model').projectDir = new File(rootDir, 'Lambda/Model')
+project(':Events').projectDir = new File(rootDir, 'Lambda/Events')

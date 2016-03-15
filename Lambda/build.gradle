@@ -48,6 +48,78 @@ def libs = [
 ]
 
 subprojects {
+/*
+        apply plugin: 'scala'
+
+        repositories {
+                mavenCentral()
+                jcenter()
+        }
+
+        dependencies {
+                compile(libs.scala_lang)
+                compile files("./lib/Proper-1.0.jar")
+
+                testCompile(libs.scalacheck)
+                testCompile(libs.scalatest)
+                testCompile(libs.junit)
+        }
+*/
+}
+
+project(':Model') {
+        apply plugin: 'scala'
+
+        repositories {
+                mavenCentral()
+                jcenter()
+        }
+
+        dependencies {
+                compile(libs.scala_lang)
+                compile files("./lib/Proper-1.0.jar")
+
+                testCompile(libs.scalacheck)
+                testCompile(libs.scalatest)
+                testCompile(libs.junit)
+        }
+}
+
+project(':Batch-Layer') {
+
+        apply plugin: 'scala'
+
+        repositories {
+                mavenCentral()
+                jcenter()
+        }
+
+        dependencies {
+                compile project(':Model')
+                compile project(':Events')
+                compile(libs.kafka)
+                compile([group: libs.spark.group, version: libs.spark.version, name: libs.spark.sql])
+                compile([group: libs.spark.group, version: libs.spark.version, name: libs.spark.streaming])
+                compile([group: libs.spark.group, version: libs.spark.version, name: libs.spark.streaming_kafka])
+                compile(libs.genson)
+                compile(libs.scala_lang)
+                compile files("./lib/Proper-1.0.jar")
+
+                testCompile(libs.scalacheck)
+                testCompile(libs.scalatest)
+                testCompile(libs.junit)
+        }
+
+        sourceSets {
+                test {
+                        scala {
+                                srcDirs = ['src/test/scala', 'src/drafts/scala']
+                        }
+                }
+        }
+}
+
+project(':Events') {
 
         apply plugin: 'scala'
 
@@ -66,40 +138,30 @@ subprojects {
         }
 }
 
-project(':Model') {
-
-}
-
-project(':Batch-Layer') {
-
-        dependencies {
-                compile project(':Model')
-                compile(libs.kafka)
-                compile([group: libs.spark.group, version: libs.spark.version, name: libs.spark.sql])
-                compile([group: libs.spark.group, version: libs.spark.version, name: libs.spark.streaming])
-                compile([group: libs.spark.group, version: libs.spark.version, name: libs.spark.streaming_kafka])
-                compile(libs.genson)
-        }
-
-        sourceSets {
-                test {
-                        scala {
-                                srcDirs = ['src/test/scala', 'src/drafts/scala']
-                        }
-                }
-        }
-}
-
 project(':Speed-Layer') {
 
+        apply plugin: 'scala'
+
+        repositories {
+                mavenCentral()
+                jcenter()
+        }
+
         dependencies {
                 compile project(':Model')
+                compile project(':Events')
                 compile(libs.kafka)
                 compile([group: libs.spark.group, version: libs.spark.version, name: libs.spark.sql])
                 compile([group: libs.spray.group, version: libs.spray.version, name: libs.spray.spray_can])
                 compile([group: libs.spray.group, version: libs.spray.version, name: libs.spray.spray_http])
                 compile([group: libs.spray.group, version: libs.spray.version, name: libs.spray.spray_routing])
                 compile(libs.genson)
+                compile(libs.scala_lang)
+                compile files("./lib/Proper-1.0.jar")
+
+                testCompile(libs.scalacheck)
+                testCompile(libs.scalatest)
+                testCompile(libs.junit)
         }
 
         sourceSets {

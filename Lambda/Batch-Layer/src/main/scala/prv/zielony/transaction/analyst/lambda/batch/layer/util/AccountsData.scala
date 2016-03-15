@@ -1,9 +1,7 @@
 package prv.zielony.transaction.analyst.lambda.batch.layer.util
 
 import org.apache.spark.rdd.RDD
-import prv.zielony.transaction.analyst.lambda.batch.layer.events._
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.accounts.{AccountRemovedEvent, AccountCreatedEvent}
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.transactions.{TransferEvent, CashOperationEvent}
+import prv.zielony.transaction.analyst.lambda.events.accounts.{AccountRemovedEvent, AccountCreatedEvent}
 
 /**
  * Created by zielony on 20.02.16.

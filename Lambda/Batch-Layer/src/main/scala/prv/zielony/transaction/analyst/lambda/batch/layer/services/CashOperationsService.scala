@@ -3,7 +3,8 @@ package prv.zielony.transaction.analyst.lambda.batch.layer.services
 import java.time.LocalDateTime
 
 import org.apache.spark.rdd.RDD
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.transactions.{TransactionStatus, CashOperationEvent}
+import org.apache.spark.sql.Dataset
+import prv.zielony.transaction.analyst.lambda.events.transactions.{CashOperationEvent, TransactionStatus}
 import prv.zielony.transaction.analyst.lambda.model.{CashOperationType, Currency, CashOperation}
 
 /**
@@ -11,7 +12,7 @@ import prv.zielony.transaction.analyst.lambda.model.{CashOperationType, Currency
  */
 object CashOperationsService {
 
-  def getAllSuccessfulCashOperations(operations:(=> RDD[CashOperationEvent])):RDD[CashOperation] = {
+  def getAllSuccessfulCashOperations(operations: => RDD[CashOperationEvent]):RDD[CashOperation] = {
 
     operations filter { event =>
       event.status == TransactionStatus.Success

@@ -1,10 +1,12 @@
 package prv.zielony.transaction.analyst.classical.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import prv.zielony.transaction.analyst.classical.services.ClientsService;
 
 import java.time.LocalDateTime;
 
@@ -14,19 +16,18 @@ import java.time.LocalDateTime;
 @RestController("/clients")
 public class ClientsController {
 
-    @RequestMapping(value="/age/average?country={country}&timestamp={timestamp}", method = RequestMethod.GET,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Double getAverageClientAge(@RequestParam("country") String country,
-                                      @RequestParam("timestamp")LocalDateTime timestamp){
+    @Autowired
+    private ClientsService clientsService;
 
-        return 18.0;
+    @RequestMapping(value="/age/average?country={country}", method = RequestMethod.GET,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Double getAverageClientAge(@RequestParam("country") String country){
+        return clientsService.calculateAverageClientAge(country);
     }
 
-    @RequestMapping(value="/age/median?country={country}&timestamp={timestamp}", method = RequestMethod.GET,
+    @RequestMapping(value="/age/median?country={country}", method = RequestMethod.GET,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Double getClientAgeMedian(@RequestParam("country") String country,
-                                      @RequestParam("timestamp")LocalDateTime timestamp){
-
-        return 18.0;
+    public Double getClientAgeMedian(@RequestParam("country") String country){
+        return clientsService.calculateClientAgeMedian(country);
     }
 }

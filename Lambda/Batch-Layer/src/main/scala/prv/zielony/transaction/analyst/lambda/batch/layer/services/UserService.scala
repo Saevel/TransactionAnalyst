@@ -2,11 +2,10 @@ package prv.zielony.transaction.analyst.lambda.batch.layer.services
 
 import java.time.LocalDateTime
 import java.util.Date
-
 import org.apache.spark.rdd.RDD
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.Event
-import prv.zielony.transaction.analyst.lambda.batch.layer.events.users.{PersonalDataChangedEvent, UserCreatedEvent, ContactDataChangedEvent}
 import prv.zielony.transaction.analyst.lambda.batch.layer.util.UsersData
+import prv.zielony.transaction.analyst.lambda.events.Event
+import prv.zielony.transaction.analyst.lambda.events.users.{UserCreatedEvent, PersonalDataChangedEvent, ContactDataChangedEvent}
 import prv.zielony.transaction.analyst.lambda.model.User
 
 /**
@@ -14,7 +13,7 @@ import prv.zielony.transaction.analyst.lambda.model.User
  */
 object UserService {
 
-  private[services] def findActiveUsers(usersData:(=> UsersData)):RDD[User] = {
+  private[services] def findActiveUsers(usersData: => UsersData):RDD[User] = {
 
     val activeUsers = usersData.createdEvents keyBy(_.id) subtractByKey (usersData.removedEvents keyBy(_.id))
 
